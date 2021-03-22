@@ -36,46 +36,34 @@ class AllegroController extends AppController
      */
     public function index()
     {
-        $allegro = new Allegro();
-
-        $allegro_categories = $allegro->GetCategories($this->allegro_token['access_token']);
+        $allegro_categories = $this->allegro->GetCategories($this->allegro_token['access_token']);
 
         $this->set(compact('allegro_categories'));
     }
 
     /**
      * funkcja majaca odnaleźć przedmiot po słowach
-     * niestety w budowie
-     * proszę traktować jakby jej nie było
-     * (narazie)
+     *
      */
-    public function finditem($item=null)
+    public function finditem($itemss='harry')
     {
-        $allegro = new Allegro();
+        $this->request->allowMethod('get');
         $allegroItems = null;
 
-        if($this->request->is('get'))
+        if($this->request->is('get') && $this->request->getQuery('itemss') !== null)
         {
+                $itemss = $this->request->getQuery('itemss');
+                $allegroItems = $this->allegro->FindItem($this->allegro_token['access_token'],$itemss);
 
-           // if($allegro->execute($this->request->getData()))
-           // {
-                $items = $this->request->getData('itemss');
-                echo $items;
-                //$items = implode(' ',$item);
-
-                $allegroItems = $allegro->FindItem($items);
-                ///$allegro->setData(['allegroItems'=>$allegro->FindItem($items)]);
-           /* }
-            else
-            {
-                $this->Flash->error('There is no allegro->execute->(this->request->getdata()');
-                $allegro->setData(['allegroItems'=>null,
-                                    'items'=>['książę','harry']]);
-                //$allegroItems = null;
-            }*/
         }
-        $this->set(compact('items'));
-        $this->set('allegro',$allegro);
+        else
+        {
+                $itemss = 'harry ksiaze';
+                $allegroItems = $this->allegro->FindItem($this->allegro_token['access_token'],$itemss);
+        }
+
+        $this->set(compact('itemss'));
+        $this->set('allegro',$this->allegro);
         $this->set(compact('allegroItems'));
     }
 

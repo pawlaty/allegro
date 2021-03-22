@@ -77,6 +77,17 @@ class Allegro extends Form
         return true;
     }
 
+    /**
+     * Sprawdza dane wejsciowe od urzytkownika do funkcji
+     */
+    private function myValidation(String $param):String
+    {
+        $param = trim($param);
+        $param = stripcslashes($param);
+        $param = htmlspecialchars($param);
+        return $param;
+    }
+
     /*
     *zwraca tokena po autoryzacji
     *
@@ -85,8 +96,8 @@ class Allegro extends Form
     {
         $http = new Client(['headers' => ['Content-Type' => 'application/json']]);
         $response = $http->get('https://allegro.pl.allegrosandbox.pl/auth/oauth/token?grant_type=client_credentials',[],
-                                ['auth'=> ['username' => '**************61d3',
-                                            'password'=>'**********************uHwIeIzxhUCFEC'
+                                ['auth'=> ['username' => '*************************1281fd91361d3',
+                                            'password'=>'******************************I1otFhwK7ywokXxYuHwIeIzxhUCFEC'
                                           ]]);
         $this->result = $response->getJson();   //dostęp do pola obiektu JSON: $result['access_token'];
 
@@ -120,21 +131,17 @@ class Allegro extends Form
     */
     public function FindItem(String $token, String $words):array
     {
+        $words = $this->myValidation($words);
 
-        $getItemByWord = "https://api.allegro.pl.allegrosandbox.pl/offers/listing?phrase={$words}&searchMode=REGULAR&fallback=true&include=-all&include=filters";
-        /*
-        if(!is_array($words)){
-            exit('wrong type parametrs');
-        }
-        !trzeba bedzie sprawdzic zapytnie dla wszystkich slow
-        $words_str = implode(' ',$words);*/
+        $getItemByWord = "https://api.allegro.pl.allegrosandbox.pl/offers/listing?phrase={$words}&searchMode=REGULAR&fallback=false&include=-all&include=filters";
 
         $http = new Client();
-        $response = $http->get("https://api.allegro.pl/offers/listing?phrase={$words}&searchMode=REGULAR&fallback=true&include=-all&include=filters",[],
+
+        $response = $http->get($getItemByWord,[],
                                ['headers' => ['Title'=>'my title','Authorization'=>'Bearer '.$token, "Accept"=>"application/vnd.allegro.public.v1+json"]]);
 
         $this->CheckResult($response);
-        $result = $response->getJson();
+
 
         return $this->result['responseJSON'];
 
